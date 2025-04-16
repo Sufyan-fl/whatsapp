@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../widgets/coming_soon.dart';
+import '../../../widgets/settings_panel.dart';
 import 'layout_controller.dart';
 import 'navigation_controller.dart';
 
@@ -17,72 +19,93 @@ class SidebarIcons extends StatelessWidget {
         color: const Color(0xFF1F2C34),
         height: double.infinity,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(height: 12),
+            Column(
+              children: [
+                const SizedBox(height: 12),
 
-            // Menu Icon
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.menu, size: 20, color: Colors.white70),
-                tooltip: "Navigation",
-                onPressed: () => Get.find<NavigationController>().toggle(),
-              ),
+                // Menu Icon
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon:
+                        const Icon(Icons.menu, size: 20, color: Colors.white70),
+                    tooltip: "Navigation",
+                    onPressed: () => Get.find<NavigationController>().toggle(),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // TOP Section
+                _sidebarIcon(
+                    Icons.chat, PanelView.chats, layout, "Chats", expanded),
+                _sidebarIcon(
+                    Icons.call, PanelView.calls, layout, "Calls", expanded),
+                _sidebarIcon(Icons.radio_button_checked, PanelView.status,
+                    layout, "Status", expanded),
+                _sidebarIcon(Icons.bolt, null, layout, "Meta AI", expanded),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(color: Colors.white24, height: 1),
+                ),
+              ],
             ),
+            Column(
+              children: [
+                // BOTTOM Section
+                _sidebarIcon(
+                    Icons.lock_outline, null, layout, "Locked chats", expanded,
+                    comingSoon: true),
+                _sidebarIcon(
+                    Icons.star_border, null, layout, "Starred", expanded,
+                    comingSoon: true),
+                _sidebarIcon(
+                    Icons.archive_outlined, null, layout, "Archived", expanded,
+                    comingSoon: true),
 
-            const SizedBox(height: 8),
+                _sidebarIcon(
+                  Icons.settings,
+                  null,
+                  layout,
+                  "Settings",
+                  expanded,
+                  onTapOverride: () {
+                    Get.dialog(const SettingsPanel(), barrierDismissible: true);
+                  },
+                ),
 
-            // TOP Section
-            _sidebarIcon(
-                Icons.chat, PanelView.chats, layout, "Chats", expanded),
-            _sidebarIcon(
-                Icons.call, PanelView.calls, layout, "Calls", expanded),
-            _sidebarIcon(Icons.radio_button_checked, PanelView.status, layout,
-                "Status", expanded),
-            _sidebarIcon(Icons.bolt, null, layout, "Meta AI", expanded),
+                const SizedBox(height: 12),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Divider(color: Colors.white24, height: 1),
-            ),
-
-            // Push bottom section down
-            const Spacer(),
-
-            // BOTTOM Section
-            _sidebarIcon(
-                Icons.lock_outline, null, layout, "Locked chats", expanded),
-            _sidebarIcon(Icons.star_border, null, layout, "Starred", expanded),
-            _sidebarIcon(
-                Icons.archive_outlined, null, layout, "Archived", expanded),
-            _sidebarIcon(Icons.settings, null, layout, "Settings", expanded),
-
-            const SizedBox(height: 12),
-
-            if (expanded)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12, left: 12),
-                child: Row(
-                  children: const [
-                    CircleAvatar(
-                      radius: 16,
+                if (expanded)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12, left: 12),
+                    child: Row(
+                      children: const [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundImage:
+                              NetworkImage("https://i.pravatar.cc/150?img=11"),
+                        ),
+                        SizedBox(width: 12),
+                        Text("Your Name",
+                            style: TextStyle(color: Colors.white70)),
+                      ],
+                    ),
+                  )
+                else
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: CircleAvatar(
+                      radius: 18,
                       backgroundImage:
                           NetworkImage("https://i.pravatar.cc/150?img=11"),
                     ),
-                    SizedBox(width: 12),
-                    Text("Your Name", style: TextStyle(color: Colors.white70)),
-                  ],
-                ),
-              )
-            else
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundImage:
-                      NetworkImage("https://i.pravatar.cc/150?img=11"),
-                ),
-              ),
+                  ),
+              ],
+            )
           ],
         ),
       ),
@@ -94,26 +117,34 @@ class SidebarIcons extends StatelessWidget {
     PanelView? view,
     LayoutController layout,
     String tooltip,
-    bool expanded,
-  ) {
-    final isSelectable = view != null;
-
+    bool expanded, {
+    bool comingSoon = false,
+    VoidCallback? onTapOverride,
+  }) {
     return Tooltip(
       message: tooltip,
       verticalOffset: -40,
       child: InkWell(
         onTap: () {
-          if (isSelectable) {
+          if (onTapOverride != null) {
+            onTapOverride();
+          } else if (view != null) {
             layout.switchView(view);
-            Get.find<NavigationController>().close();
+          } else if (comingSoon) {
+            Get.dialog(
+              Dialog(
+                child: ComingSoon(title: tooltip),
+              ),
+            );
           }
+          Get.find<NavigationController>().close();
         },
-        child: isSelectable
+        child: view != null
             ? Obx(() {
                 final isSelected = layout.selectedView.value == view;
                 return _buildIconRow(icon, tooltip, isSelected, expanded);
               })
-            : _buildIconRow(icon, tooltip, false, expanded), // No Obx
+            : _buildIconRow(icon, tooltip, false, expanded),
       ),
     );
   }
