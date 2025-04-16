@@ -1,11 +1,15 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'app/modules/layouts/layout_controller.dart';
+import 'app/modules/layouts/navigation_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
 
 void main() {
+  Get.put(LayoutController());
+  Get.put(NavigationController());
   runApp(const WhatsAppClone());
 }
 
