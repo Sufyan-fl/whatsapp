@@ -12,8 +12,15 @@ import '../status/status_placeholder.dart';
 import '../status/status_view.dart';
 import 'chat_placeholder.dart';
 
-class DesktopLayoutView extends StatelessWidget {
+class DesktopLayoutView extends StatefulWidget {
   const DesktopLayoutView({super.key});
+
+  @override
+  State<DesktopLayoutView> createState() => _DesktopLayoutViewState();
+}
+
+class _DesktopLayoutViewState extends State<DesktopLayoutView> {
+  double middlePanelWidth = 320;
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +31,14 @@ class DesktopLayoutView extends StatelessWidget {
       backgroundColor: const Color(0xFF111B21),
       body: Stack(
         children: [
-          // Main layout row
           Row(
             children: [
-              SidebarIcons(), // small sidebar always visible
+              // Sidebar
+              const SidebarIcons(),
 
+              // Middle Panel (Resizable)
               SizedBox(
-                width: 320,
+                width: middlePanelWidth,
                 child: ColoredBox(
                   color: const Color(0xFF121B22),
                   child: Column(
@@ -52,8 +60,26 @@ class DesktopLayoutView extends StatelessWidget {
                 ),
               ),
 
-              const VerticalDivider(width: 1, color: Colors.grey),
+              // Drag Handle
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onHorizontalDragUpdate: (details) {
+                  setState(() {
+                    middlePanelWidth += details.delta.dx;
+                    if (middlePanelWidth < 220) middlePanelWidth = 220;
+                    if (middlePanelWidth > 500) middlePanelWidth = 500;
+                  });
+                },
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.resizeLeftRight,
+                  child: Container(
+                    width: 4,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ),
 
+              // Right Panel
               Expanded(
                 child: Obx(() {
                   final view = layout.selectedView.value;
@@ -67,30 +93,24 @@ class DesktopLayoutView extends StatelessWidget {
             ],
           ),
 
-          // ✅ Expanded Sidebar Overlay
+          // Overlay Sidebar (Expanded)
           Obx(() {
-            print("📡 Expanded sidebar visible: ${nav.isExpanded.value}");
             return nav.isExpanded.value
                 ? Stack(
                     children: [
-                      // Click-outside-to-close layer
                       Positioned.fill(
                         child: GestureDetector(
                           onTap: nav.close,
                           behavior: HitTestBehavior.translucent,
                         ),
                       ),
-
-                      // Overlay sidebar on top of everything
                       Positioned(
                         top: 0,
                         left: 0,
                         bottom: 0,
                         child: SizedBox(
                           width: 240,
-                          child: SidebarIcons(
-                            expanded: true,
-                          ), // full width sidebar
+                          child: SidebarIcons(expanded: true),
                         ),
                       ),
                     ],

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 class SettingsPanel extends StatefulWidget {
-  const SettingsPanel({super.key});
-
+  final String initialTab;
+  const SettingsPanel({super.key, this.initialTab = "General"});
   @override
   State<SettingsPanel> createState() => _SettingsPanelState();
 }
 
 class _SettingsPanelState extends State<SettingsPanel> {
-  String selectedTab = "General";
+  late String selectedTab;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTab = widget.initialTab;
+  }
 
   final List<String> tabs = [
     "General",
@@ -20,6 +26,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
     "Storage",
     "Shortcuts",
     "Help",
+    "Profile", // ✅ Add this as last tab
   ];
 
   @override
@@ -88,82 +95,94 @@ class _SettingsPanelState extends State<SettingsPanel> {
   }
 
   Widget _buildSettingsContent(String tab) {
-    if (tab != "General") {
-      return Center(
-        child: Text("$tab settings coming soon...",
-            style: TextStyle(color: Colors.grey[400])),
+    if (tab == "General") {
+      return const Text("General settings go here",
+          style: TextStyle(color: Colors.white));
+    }
+
+    if (tab == "Profile") {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              radius: 36,
+              backgroundImage: NetworkImage(
+                "https://media.istockphoto.com/id/916306960/photo/faceless-man-in-hoodie-standing-isolated-on-black.jpg?s=612x612&w=0&k=20&c=pMeGd1UuJgvdZ2gV2VQC2Jn3VwMNeW6TF3cG9RIo1tY=",
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Sufyan",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ),
+                Icon(Icons.edit, size: 18, color: Colors.white54),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "About",
+                style: TextStyle(color: Colors.white54),
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "When you don't get the Miracle, be one.",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                Icon(Icons.edit, size: 18, color: Colors.white54),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Phone number",
+                style: TextStyle(color: Colors.white54),
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "+92 334 6264573",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const Divider(height: 30, color: Colors.grey),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[400],
+                minimumSize: const Size.fromHeight(40),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child:
+                  const Text("Log out", style: TextStyle(color: Colors.white)),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              "Chat history on this computer will be cleared when you log out.",
+              style: TextStyle(color: Colors.white54, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("General",
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        const Text("Login",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            Text("Start WhatsApp at login",
-                style: TextStyle(color: Colors.white)),
-            Switch(value: false, onChanged: null),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const Text("Language",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A3942),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: DropdownButton<String>(
-            value: "System default",
-            dropdownColor: const Color(0xFF2A3942),
-            iconEnabledColor: Colors.white70,
-            underline: const SizedBox.shrink(),
-            isExpanded: true,
-            items: const [
-              DropdownMenuItem(
-                value: "System default",
-                child: Text("System default",
-                    style: TextStyle(color: Colors.white)),
-              ),
-              DropdownMenuItem(
-                value: "English",
-                child: Text("English", style: TextStyle(color: Colors.white)),
-              ),
-            ],
-            onChanged: (_) {},
-          ),
-        ),
-        const SizedBox(height: 24),
-        const Text("Typing",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
-        const Text(
-          "Change typing settings for autocorrect and misspelled highlight from Windows Settings.",
-          style: TextStyle(color: Colors.white70),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            Text("Replace text with emoji",
-                style: TextStyle(color: Colors.white)),
-            Switch(value: true, onChanged: null),
-          ],
-        ),
-      ],
-    );
+    // Add logic for other tabs if needed
+    return Text("$tab settings go here",
+        style: const TextStyle(color: Colors.white));
   }
 
   IconData _getIcon(String tab) {
@@ -184,6 +203,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
         return Icons.keyboard;
       case "Help":
         return Icons.help_outline;
+      case "Profile":
+        return Icons.person;
       default:
         return Icons.settings;
     }

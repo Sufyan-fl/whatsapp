@@ -14,7 +14,7 @@ class SidebarIcons extends StatelessWidget {
     final layout = Get.find<LayoutController>();
 
     return SizedBox(
-      width: expanded ? 240 : 60, // ✅ enough space
+      width: expanded ? 240 : 50, // ✅ enough space
       child: Container(
         color: const Color(0xFF1F2C34),
         height: double.infinity,
@@ -26,13 +26,17 @@ class SidebarIcons extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 // Menu Icon
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon:
-                        const Icon(Icons.menu, size: 20, color: Colors.white70),
-                    tooltip: "Navigation",
-                    onPressed: () => Get.find<NavigationController>().toggle(),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.menu,
+                          size: 15, color: Colors.white70),
+                      tooltip: "Navigation",
+                      onPressed: () =>
+                          Get.find<NavigationController>().toggle(),
+                    ),
                   ),
                 ),
 
@@ -79,31 +83,24 @@ class SidebarIcons extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                if (expanded)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12, left: 12),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                          radius: 16,
-                          backgroundImage:
-                              NetworkImage("https://i.pravatar.cc/150?img=11"),
-                        ),
-                        SizedBox(width: 12),
-                        Text("Your Name",
-                            style: TextStyle(color: Colors.white70)),
-                      ],
-                    ),
-                  )
-                else
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundImage:
-                          NetworkImage("https://i.pravatar.cc/150?img=11"),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.dialog(
+                        const SettingsPanel(
+                            initialTab: "Profile"), // ✅ opens on Profile
+                        barrierDismissible: true,
+                      );
+                    },
+                    child: const CircleAvatar(
+                      radius: 14,
+                      backgroundImage: NetworkImage(
+                          "https://media.istockphoto.com/id/916306960/photo/faceless-man-in-hoodie-standing-isolated-on-black.jpg?s=612x612&w=0&k=20&c=pMeGd1UuJgvdZ2gV2VQC2Jn3VwMNeW6TF3cG9RIo1tY=",
+                          scale: 1.0),
                     ),
                   ),
+                ),
               ],
             )
           ],
@@ -123,7 +120,7 @@ class SidebarIcons extends StatelessWidget {
   }) {
     return Tooltip(
       message: tooltip,
-      verticalOffset: -40,
+      verticalOffset: -50,
       child: InkWell(
         onTap: () {
           if (onTapOverride != null) {
@@ -154,7 +151,7 @@ Widget _buildIconRow(
     IconData icon, String tooltip, bool selected, bool expanded) {
   return Container(
     width: double.infinity,
-    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 15),
     decoration: BoxDecoration(
       color: selected ? Colors.white10 : Colors.transparent,
       border: selected
@@ -165,7 +162,7 @@ Widget _buildIconRow(
     ),
     child: Row(
       children: [
-        Icon(icon, color: Colors.white70, size: 20),
+        Icon(icon, color: Colors.white70, size: 15),
         if (expanded) ...[
           const SizedBox(width: 12),
           Flexible(
